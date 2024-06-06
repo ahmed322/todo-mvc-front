@@ -53,7 +53,6 @@ let getTasks = (): void => {
 	axios
 		.request(config)
 		.then((res) => {
-			console.log(res.data);
 			// push data to array if it success
 			if (res.status) {
 				tasksLists.value = res.data;
@@ -65,20 +64,81 @@ let getTasks = (): void => {
 
 // functions to modify tasks list
 function checkTask(id: string): void {
-	tasksLists.value?.find((e) => (e._id === id ? (e.status = "completed") : ""));
+	// axios config object for post request
+	let config = {
+		method: "put",
+		url: baseUrl + "/" + id,
+		headers: {
+			"Content-Type": "application/json",
+		},
+		data: { status: "completed" },
+	};
+
+	// send data to server
+	axios
+		.request(config)
+		.then((res) => {
+			// push data to array if it success
+			if (res.status) {
+				tasksLists.value?.find((e) =>
+					e._id === id ? (e.status = "completed") : ""
+				);
+				// console.log(res.data.message) // Optional: Log success message
+			}
+		})
+		.catch((err) => console.log(err));
 }
 
 // function to uncheck checkbox
 function unCheckTask(id: string): void {
-	tasksLists.value?.find((e) => (e._id === id ? (e.status = "active") : ""));
+	// axios config object for post request
+	let config = {
+		method: "put",
+		url: baseUrl + "/" + id,
+		headers: {
+			"Content-Type": "application/json",
+		},
+		data: { status: "active" },
+	};
+
+	// send data to server
+	axios
+		.request(config)
+		.then((res) => {
+			// push data to array if it success
+			if (res.status) {
+				tasksLists.value?.find((e) =>
+					e._id === id ? (e.status = "active") : ""
+				);
+				// console.log(res.data.message) // Optional: Log success message
+			}
+		})
+		.catch((err) => console.log(err));
 }
-
+// ! fix delete not work well
 function deleteTask(id: string): void {
-	let taskIndex = tasksLists.value?.findIndex((e) => e._id === id);
+	let config = {
+		method: "delete",
+		url: baseUrl + "/" + id,
+		headers: {
+			"Content-Type": "application/json",
+		},
+	};
 
-	if (taskIndex !== undefined && taskIndex >= 0) {
-		tasksLists.value?.splice(taskIndex, 1);
-	}
+	// send data to server
+	axios
+		.request(config)
+		.then((res) => {
+			// push data to array if it success
+			if (res.status) {
+				let taskIndex = tasksLists.value?.findIndex((e) => e._id === id);
+
+				if (taskIndex !== undefined && taskIndex >= 0) {
+					tasksLists.value?.splice(taskIndex, 1);
+				}
+			}
+		})
+		.catch((err) => console.log(err));
 }
 
 function filterTasks(e: string) {
