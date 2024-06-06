@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import axios from "axios";
 import TheForm from "@/components/TheForm.vue";
 import TheTitle from "@/components/TheTitle.vue";
@@ -13,7 +13,7 @@ let tasksLists = ref<tasksList[] | null>([]);
 let filter = ref("all");
 const baseUrl = import.meta.env.VITE_API_URL;
 
-// send data to server
+// send new task to server
 let pushNewTask = (data: tasksList): void => {
 	// axios config object for post request
 	let config = {
@@ -33,6 +33,30 @@ let pushNewTask = (data: tasksList): void => {
 			// push data to array if it success
 			if (res.status) {
 				tasksLists.value?.unshift(res.data);
+				// console.log(res.data.message) // Optional: Log success message
+			}
+		})
+		.catch((err) => console.log(err));
+};
+
+let getTasks = (): void => {
+	// axios config object for get request
+	let config = {
+		method: "get",
+		url: baseUrl,
+		headers: {
+			"Content-Type": "application/json",
+		},
+	};
+
+	// send data to server
+	axios
+		.request(config)
+		.then((res) => {
+			console.log(res.data);
+			// push data to array if it success
+			if (res.status) {
+				tasksLists.value = res.data;
 				// console.log(res.data.message) // Optional: Log success message
 			}
 		})
@@ -85,6 +109,12 @@ let taskCounts = computed<number>(() => {
 	} else {
 		return 0;
 	}
+});
+
+// hooks
+onMounted(() => {
+	// get tasks wehn mount the app
+	getTasks();
 });
 </script>
 <template>
