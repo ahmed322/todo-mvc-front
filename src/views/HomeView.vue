@@ -145,8 +145,23 @@ function filterTasks(e: string) {
 	filter.value = e;
 }
 
-function deleteAllTasks() {
-	tasksLists.value?.forEach(() => tasksLists.value?.pop());
+function deleteCompletedTasks() {
+	let config = {
+		method: "delete",
+		url: baseUrl,
+		headers: {
+			"Content-Type": "application/json",
+		},
+	};
+
+	axios
+		.request(config)
+		.then((res) => {
+			if (res.status && res.data) {
+				tasksLists.value = res.data;
+			}
+		})
+		.catch((err) => console.log(err));
 }
 
 // computed properties for filtered tasks
@@ -190,7 +205,7 @@ onMounted(() => {
 
 		<TheControls
 			@@toggle-tasks="filterTasks"
-			@@clear-tasks="deleteAllTasks"
+			@@clear-tasks="deleteCompletedTasks"
 			:count="taskCounts"
 		/>
 	</main>
